@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './Components/Header';
 import Footer from './Components/Footer';
 import Hero from './Components/Hero';
@@ -29,28 +29,33 @@ const Home = () => {
     { id: 8, name: 'EYE SHADOW COLLECTION | RADIANT SHADES | LUXE-5', price: 34.99, rate: 4.1, image: image8 },
   ];
 
-  // Cart state
   const [cart, setCart] = useState<any[]>([]);
 
-  // Handle add to cart
+  useEffect(() => {
+    const storedCart = localStorage.getItem('cart');
+    if (storedCart) {
+      setCart(JSON.parse(storedCart));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
+
   const addToCart = (product: any) => {
     const updatedCart = [...cart];
     const existingProduct = updatedCart.find(item => item.id === product.id);
 
     if (existingProduct) {
-      existingProduct.quantity += 1; // If product already in cart, increase quantity
+      existingProduct.quantity += 1;
     } else {
-      updatedCart.push({ ...product, quantity: 1 }); // Add new product with quantity 1
+      updatedCart.push({ ...product, quantity: 1 });
     }
 
     setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart)); // Update localStorage
   };
 
-  // Cart item count for the Header
   const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
-
-  
 
   return (
     <>
@@ -60,10 +65,7 @@ const Home = () => {
         <h1 className="text-6xl text-pink-600 font-bold mb-10 text-center">New Products</h1>
         <section className="products grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8">
           {products.map((product) => (
-            <div
-              key={product.id}
-              className="border p-4 rounded-lg hover:shadow-lg transition-all duration-300"
-            >
+            <div key={product.id} className="border p-4 rounded-lg hover:shadow-lg transition-all duration-300">
               <div className="relative group">
                 <Image
                   src={product.image}
@@ -72,38 +74,11 @@ const Home = () => {
                   width={400}
                   height={400}
                 />
-                <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-all duration-300"></div>
-                <div className="absolute inset-0 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300">
-                  <p className="text-xl font-bold">Shop Now</p>
-                </div>
               </div>
               <h2 className="text-xl font-bold mt-4">{product.name}</h2>
               <p className="mt-2 text-gray-600">${product.price}</p>
-
-              {/* Show rating */}
-              <div className="flex items-center mt-2 text-yellow-500">
-                {Array.from({ length: 5 }, (_, index) => (
-                  <svg
-                    key={index}
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill={index < product.rate ? 'currentColor' : 'none'}
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    className="w-4 h-4 mr-1"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
-                    />
-                  </svg>
-                ))}
-              </div>
-
-              {/* Add to Cart button under the rating */}
               <button
-                onClick={() => addToCart(product)} // Add to Cart
+                onClick={() => addToCart(product)}
                 className="mt-4 w-full py-2 px-4 bg-pink-600 text-white rounded-full"
               >
                 Add to Cart
@@ -114,7 +89,7 @@ const Home = () => {
       </main>
       <Grid />
       <Slider />
-      <Member/>
+      <Member />
       <Promotion />
       <Footer />
     </>
@@ -122,9 +97,5 @@ const Home = () => {
 };
 
 export default Home;
-
-
-
-
 
 
